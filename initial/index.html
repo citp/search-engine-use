@@ -5,13 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="studyPhase" data-value="initial">
+
     <title>Princeton University - Search Engine Use Study</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 
-    <link rel="stylesheet" href="./resources/css/style.css">
+    <link rel="stylesheet" href="../resources/css/style.css">
 
-    <link rel="icon" href="./resources/images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="../resources/images/favicon.ico" type="image/x-icon">
 </head>
 
 <body>
@@ -20,7 +22,7 @@
             <div class="columns is-mobile">
                 <div class="column is-2-tablet is-5-mobile is-offset-2-tablet" style="padding: 0;">
                     <figure class="image">
-                        <img src="./resources/images/princeton-logo.png">
+                        <img src="../resources/images/princeton-logo.png">
                     </figure>
                 </div>
             </div>
@@ -55,9 +57,13 @@
                             <br>
                             <br>
                             A detailed description of the types of data that we will collect from your web browser is
-                            <b><a href="">available here</a></b>. If you would like to inspect
+                            <b><a href="https://search-engine-use.cs.princeton.edu/data_collection_details.pdf"
+                                    target="_blank">available
+                                    here</a></b>. If you would like to inspect
                             the source code
-                            for this project, it is <b><a href="">available here</a></b>. You will have an opportunity
+                            for this project, it is <b><a href="https://github.com/citp/search-engine-use"
+                                    target="_blank">available
+                                    here</a></b>. You will have an opportunity
                             to
                             preview the exact data that we will collect from your web browser before you submit it to
                             us.
@@ -78,7 +84,8 @@
                 <div class="columns is-centered">
                     <div class="column is-8">
                         <p>
-                            Please follow the steps below to provide web search and browsing information for this study.
+                            Please follow the steps below to provide web search and browsing information for this
+                            study.
                         </p>
                     </div>
                 </div>
@@ -86,17 +93,21 @@
                     <div class="column is-7">
                         <ol type="1">
                             <li>Install the <b><a
-                                        href="https://chrome.google.com/webstore/detail/export-chrome-history/dihloblpkeiddiaojbagoecedbfpifdj/">Export
+                                        href="https://chrome.google.com/webstore/detail/export-chrome-history/dihloblpkeiddiaojbagoecedbfpifdj/"
+                                        target="_blank">Export
                                         Chrome History</a></b> web browser extension. We ask you to
                                 install this
-                                extension so that you can create a file with your web browser history data. Please note
+                                extension so that you can create a file with your web browser history data. Please
+                                note
                                 that
                                 this extension is compatible with both Google Chrome and Microsoft Edge.
                             </li>
                             <br>
-                            <li>Open the extension webpage to export information from your web browser. You can access
+                            <li>Open the extension webpage to export information from your web browser. You can
+                                access
                                 this
-                                webpage by opening a new browser window and copying and pasting the following special
+                                webpage by opening a new browser window and copying and pasting the following
+                                special
                                 URL
                                 into the address bar.<br><br>
                                 <input id="extensionUrlTextField" class="input is-normal" type="text"
@@ -109,53 +120,64 @@
                             <br>
                             <li>In response to <b>'How far back?'</b>, select <b>'a month.'</b></li>
                             <br>
-                            <li>Click <b>'Download as JSON.'</b> Note where the file, named history.json, downloaded on
+                            <li>Click <b>'Download as JSON.'</b> Note where the file, named history.json, downloaded
+                                on
                                 your
                                 computer.</li>
                             <br>
-                            <li>Below, click <b>'Choose File.'</b> You will be prompted to select the history.json file
-                                on
-                                your
-                                computer. Code built into this webpage will automatically check that you have selected
+                            <li>Below, click <b>'Choose File.'</b> You will be prompted to select the
+                                file you downloaded in the previous step from your computer. Code built into this
+                                webpage will automatically check that you have
+                                selected
                                 the
-                                correct file and filter out information that is unnecessary for this study. If you would
+                                correct file and filter out information that is unnecessary for this study. If you
+                                would
                                 like to see the exact data that we will receive from your web browser, it will be
                                 available
-                                in the text box below before you submit it to us.</li>
+                                in the text box at the bottom of this page before you submit it to us.</li>
                             <br>
-                            <li>Please provide your Prolific ID.
-                                <input id="prolificIdInput" class="input" type="text" placeholder="Prolific ID">
+                            <div id="fileInputDiv" class="file is-primary has-name">
+                                <label class="file-label">
+                                    <input id="fileInput" class="file-input" type="file" name="historyJson"
+                                        accept=".json">
+                                    <span class="file-cta">
+                                        <span class="file-icon">
+                                            <i class="fas fa-upload"></i>
+                                        </span>
+                                        <span class="file-label">
+                                            Choose File
+                                        </span>
+                                    </span>
+                                    <span id="fileName" class="file-name">
+                                        No file selected
+                                    </span>
+                                </label>
+                            </div>
+                            <div id="file-error-message" class="hidden error-message">
+                                File selection unsuccessful, please try again.
+                            </div>
+                            <br>
+                            <li>Please provide your Prolific ID.<span class="text-red"> *</span>
                             </li>
+                            <input id="prolificIdInput" class="input" type="text" placeholder="Prolific ID">
+                            <div class="hidden error-message">
+                                Prolific ID should have 24 alphanumeric characters.
+                            </div>
                         </ol>
-
-                        <br>
                         <br>
 
-                        <div class="file has-name">
-                            <label class="file-label">
-                                <input id="fileInput" class="file-input" type="file" name="historyJson" accept=".json">
-                                <span class="file-cta">
-                                    <span class="file-icon">
-                                        <i class="fas fa-upload"></i>
-                                    </span>
-                                    <span class="file-label">
-                                        Choose a file…
-                                    </span>
-                                </span>
-                                <span id="fileName" class="file-name">
-                                    No file selected
-                                </span>
-                            </label>
-                        </div>
-
-                        <br>
-
+                        <p><b>This displays the minimized web search and browsing information that will be collected
+                                when you submit this form.</b>
+                        </p>
                         <textarea id="dataVisual" class="textarea" placeholder="10 lines of textarea" rows="10"
                             readonly> </textarea>
                     </div>
                 </div>
                 <div class="columns is-centered">
                     <div class="column is-8 has-text-centered">
+                        <div id="submit-error" class="hidden error-message">
+                            File submission unsuccessful. Please try again.
+                        </div>
                         <button id="submitButton" class="button is-link" disabled>Submit</button>
                     </div>
                 </div>
@@ -175,7 +197,7 @@
             </div>
         </div>
     </section>
-    <script src="resources/js/index.js"></script>
+    <script src="../resources/js/initial.js"></script>
 </body>
 
 </html>
