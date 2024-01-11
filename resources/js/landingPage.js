@@ -59,7 +59,14 @@ document.getElementById('submitButton').onclick = async (event) => {
                 document.getElementById('formSection').style.display = 'none';
                 document.getElementById('thankYouSection').style.display = 'block';
 
-                window.open("https://app.prolific.com/submissions/complete?cc=CYX953F7", '_blank');
+                const studyPhase = document.querySelector('meta[name="studyPhase"]').getAttribute('data-value');
+
+                if(studyPhase == "initial") {
+                    window.open("https://app.prolific.com/submissions/complete?cc=CYX953F7", '_blank');
+                } else {
+                    // Update with redirect completion for followup task in Prolific
+                    window.open("https://app.prolific.com/submissions/complete?cc=CIZ8YPGD", '_blank');
+                }
             } else {
                 throw new Error();
             }
