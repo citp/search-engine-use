@@ -4,12 +4,6 @@ let historyDataEntered = false;
 
 let outputData = {};
 
-const changedDefault = "DuckDuckGo"
-
-window.addEventListener('pageshow', function(event) {
-    document.getElementById('fileInput').value = '';
-});
-
 function unescapeCSV(csvLine) {
     let fields = [];
     let field = '';
@@ -235,20 +229,6 @@ document.getElementById('fileInput').addEventListener('change', event => {
                     return historyItem;
                 });
             }
-
-            // const daysBetweenFirstAndLastHistoryItem = (historyArray[0].visitTime - historyArray[historyArray.length - 1].visitTime) / millisecondsPerDay;
-            // if (daysBetweenFirstAndLastHistoryItem < 10) {
-            //     window.location.href = "https://app.prolific.com/submissions/complete?cc=C1AYS4YS";
-            //     return;
-            // }
-
-            if (true) {
-                historyDataEntered = false;
-                document.getElementById("file-error-message").classList.add("is-active");
-                document.getElementById("fileInputDiv").classList.add("is-danger");
-                return;
-            }
-
 
             document.getElementById("file-error-message").classList.remove("is-active");
             document.getElementById("fileInputDiv").classList.remove("is-danger");
