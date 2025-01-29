@@ -227,7 +227,6 @@ document.getElementById('fileInput').addEventListener('change', event => {
     reader.onload = function (event) {
         try {
             document.getElementById("file-error-message").classList.remove("is-active");
-            document.getElementById("file-error-message-no-test").classList.remove("is-active");
             document.getElementById("fileInputDiv").classList.remove("is-danger");
 
             let historyArray = null;
@@ -238,7 +237,6 @@ document.getElementById('fileInput').addEventListener('change', event => {
             historyArray.forEach(obj => {
                 obj.visitTime = Math.floor(obj.visitTime / 1000) * 1000;
             });
-
 
             if (studyPhase == "initial") {
                 const daysBetweenFirstAndLastHistoryItem = (historyArray[0].visitTime - historyArray[historyArray.length - 1].visitTime) / millisecondsPerDay;
@@ -263,9 +261,6 @@ document.getElementById('fileInput').addEventListener('change', event => {
                 if (!userConductedTest) {
                     historyDataEntered = false;
                     document.getElementById('submitButton').disabled = true;
-
-                    document.getElementById("file-error-message-no-test").innerText = `We have detected you have not tested your newly selected default web search engine. Please run a web search using your web browser's address bar. You may use any search query terms that you choose. This search should run with ${changedDefault}, your newly selected default web search engine. If the search still runs with your original default search engine, please return to your web browser's settings, change the default search engine to ${changedDefault}, and then run another search from the address bar. Once complete, repeat the steps outlined above to generate an updated JSON file and upload the newly generated file.`
-                    document.getElementById("file-error-message-no-test").classList.add("is-active");
 
                     document.getElementById("fileInputDiv").classList.add("is-danger");
                     document.getElementById('dataVisual').innerHTML = ""
