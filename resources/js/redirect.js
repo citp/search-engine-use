@@ -4,7 +4,7 @@ getIsDesktop = () => {
     return !check;
 };
 
-getBrowserIsChromeOrEdge = () => {
+getBrowserIsChromeOrEdgeDesktop = () => {
     try {
         const userAgent = navigator.userAgent;
 
@@ -30,21 +30,66 @@ getBrowserIsChromeOrEdge = () => {
     return false;
 }
 
-// 'initial' or 'followup'
-const studyPhase = document.querySelector('meta[name="studyPhase"]').getAttribute('data-value');
 
+
+function getIOSVersion() {
+    const ua = navigator.userAgent;
+
+    // Match iOS pattern
+    const match = ua.match(/OS (\d+)_(\d+)_?(\d+)?/);
+
+    if (match) {
+        const major = parseInt(match[1], 10);
+        const minor = parseInt(match[2], 10);
+        const patch = parseInt(match[3] || 0, 10);
+
+        return { major, minor, patch };
+    }
+    return null; // Not iOS
+}
+
+getBrowserIsSafariMobileVersion = (treatmentCondition) => {
+    try {
+        const userAgent = navigator.userAgent;
+
+        if (userAgent.match(/iPad/i)) {
+            return false;
+        }
+        if (!!userAgent.match(/CriOS/i) || !!userAgent.match(/Brave/i) || !!userAgent.match(/Ddg/i) || !!userAgent.match(/FxiOS/i) || !!userAgent.match(/EdgiOS/i)) {
+            return false;
+        }
+
+        if (!!userAgent.match(/WebKit/i) && !!userAgent.match(/iPhone/i)) {
+            if (getIOSVersion()['major'] >= 18) {
+                if (treatmentCondition >= 12 && getIOSVersion()['minor'] >= 4) {
+                    return true;
+                }
+                if (treatmentCondition < 12 && getIOSVersion()['minor'] >= 2) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return false;
+        }
+
+    } catch (error) {
+        // Do nothing
+    }
+    return false;
+}
+
+// 'initial' or 'followup'
+const studyPhase = (new URLSearchParams(window.location.search)).get("STUDY_PHASE");
+const treatmentCondition = parseInt((new URLSearchParams(window.location.search)).get("TC"), 10);
 
 (async () => {
-    const prolificId = (new URLSearchParams(window.location.search)).get("PROLIFIC_PID");
 
-    if (getBrowserIsChromeOrEdge()) {
-        if (studyPhase == "initial") {
-            window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_4SCpnYHZ9tg3SDA?PROLIFIC_PID=${prolificId}`;
-        } else {
-            window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_8v2H8SLHnJde65E?PROLIFIC_PID=${prolificId}`;
-        }
-    } else {
-        try {
+
+    try {
+        const prolificId = (new URLSearchParams(window.location.search)).get("PROLIFIC_PID");
+
+        if ((treatmentCondition <= 6 && !getBrowserIsChromeOrEdgeDesktop()) || (treatmentCondition >= 7 && !getBrowserIsSafariMobileVersion(treatmentCondition))) {
             const url = "https://n97rmes9xl.execute-api.us-east-2.amazonaws.com/deployed";
             await fetch(url, {
                 method: 'POST',
@@ -54,16 +99,51 @@ const studyPhase = document.querySelector('meta[name="studyPhase"]').getAttribut
                 body: JSON.stringify({
                     "studyPhase": studyPhase,
                     "prolificId": prolificId,
+                    "treatmentCondition": treatmentCondition,
+                    "studyPhase": studyPhase,
                 })
             });
-        } catch (error) {
-            // Do nothing
-        }
-
-        if (studyPhase == "initial") {
-            window.location.href = "https://app.prolific.com/submissions/complete?cc=C1AYS4YS";
+            // Incompatible device return code
+            window.location.href = "https://app.prolific.com/submissions/complete?cc=C13MC4S5";
         } else {
-            window.location.href = "https://app.prolific.com/submissions/complete?cc=CPO3XFDR";
+            if (studyPhase == "initial") {
+                if (treatmentCondition == 2) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_7NSBmXpjrnaQ0h8?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 3) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_3UaZUKjbxXfAJHU?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 4) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_8uE04R6xR2IjFlA?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 5) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_5dq2kczZf3KV16m?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 6) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_8GHUGkocVjGXeHY?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 7) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_3Xbb1tCAmt8iY7k?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 8) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_cS9JvLHpCqC5kGi?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 9) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_eWmbCMJmHg3ZcX4?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 10) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_bQIBq4toCpJ2X1Y?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 11) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_06by0ICd7H2MZxk?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 12) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_cDgJG6vIueTJoqi?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 13) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_8iH3gSbHLEq3ZfE?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 14) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_b1Nnm4y652pCmnY?PROLIFIC_PID=${prolificId}`;
+                } else if (treatmentCondition == 15) {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_e8uJJohSMHshzh4?PROLIFIC_PID=${prolificId}`;
+                } else {
+                    window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_cM7tV4GeFJF5YiO?PROLIFIC_PID=${prolificId}`;
+                }
+            } else {
+                window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_9ZXVhOGZ4TUQRpk?PROLIFIC_PID=${prolificId}`;
+            }
         }
+    } catch (error) {
+        // Incompatible device return code
+        window.location.href = "https://app.prolific.com/submissions/complete?cc=C13MC4S5";
     }
 })();

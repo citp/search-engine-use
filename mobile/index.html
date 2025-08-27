@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>Princeton University - Search Engine Use Study</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+
+    <link rel="stylesheet" href="../resources/css/style.css">
+
+    <link rel="icon" href="../resources/images/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+    <section class="page-content">
+        <div class="hero-body" style="padding-top: 2rem;">
+            <div class="columns is-mobile">
+                <div class="column is-2-tablet is-5-mobile is-offset-2-tablet" style="padding: 0;">
+                    <figure class="image">
+                        <img src="../resources/images/princeton-logo.png">
+                    </figure>
+                </div>
+            </div>
+            <div id="infoSection">
+                <div class="columns is-centered">
+                    <div class="column is-8">
+                        <p>
+                            This next step in the study involves providing information from Safari about how
+                            you use web search engines and how you use the web overall. This information will be based
+                            on Safari's browsing history, and it will include when and how you ran searches as well as
+                            counts of how many websites and webpages you visited over the past 30 days.
+                            <br>
+                            <br>
+                            <b>Your privacy and data security are of the utmost importance to us.</b> We have
+                            implemented technical safeguards to prevent us from collecting your search queries, the
+                            other websites or webpages that you have visited, or browser information that identifies
+                            you. You will have an opportunity to preview your information before you provide it. You may
+                            also review a detailed description of the types of data that we will collect <b><a
+                                    href="https://search-engine-use.cs.princeton.edu/data_collection_details_mobile.pdf"
+                                    target="_blank">here</a></b>.
+                            <br>
+                            <br>
+                            Please continue for step-by-step directions on how to provide this information from Safari.
+                        </p>
+                    </div>
+                </div>
+                <div class="columns is-centered">
+                    <div class="column is-8 has-text-centered">
+                        <button id="continueButton" class="button is-link">Continue &raquo;</button>
+                    </div>
+                </div>
+            </div>
+            <div id="formSection" style="display: none;">
+                <div class="columns is-centered">
+                    <div class="column is-8">
+                        <p>
+                            Please follow the steps below to provide web search and browsing information for this study.
+                        </p>
+                    </div>
+                </div>
+                <div class="columns is-centered">
+                    <div class="column is-7">
+                        <ol type="1">
+                            <li>
+                                Go to <b>Settings <img src="../resources/images/Apple settings logo.png" alt=""
+                                        style="height: 1em !important; width: 1em !important;"> > Apps > Safari</b>.
+                            </li>
+                            <br>
+                            <li>
+                                Below <b>History and Website Data</b>, tap <b>Export</b>.
+                            </li>
+                            <br>
+                            <li>
+                                Select only <b>History</b> to export.
+                                <br>
+                                If a <b>Profile</b> option appears, select <b>All</b>.
+                            </li>
+                            <br>
+                            <li>
+                                Tap <b>Save to Downloads</b>. Your iPhone may require Face ID, Touch ID, or a password.
+                            </li>
+                            <br>
+                            <li>
+                                Tap <b>Choose File</b> below, then select the <b>Safari Export [date].zip</b> file that
+                                downloaded on your iPhone. You should be able to locate this file by tapping
+                                <b>Browse</b> twice, then <b>iCloud Drive</b> or <b>On My iPhone</b> (depending on which
+                                appeared earlier), then <b>Downloads</b>. If you have difficulty locating this file, we
+                                recommend searching for <b>Safari Export</b> in <b>iCloud Drive</b> and <b>On My
+                                    iPhone</b>.
+                                <br>
+                                <br>
+                                This webpage will automatically check for the correct file and filter out unnecessary
+                                information. If you would like to see the exact data that we will receive from your web
+                                browser, it will appear in the text box below before you submit it to us.
+                            </li>
+                            <br>
+                            <div id="fileInputDiv" class="file is-primary has-name">
+                                <label class="file-label">
+                                    <input id="fileInput" class="file-input" type="file" name="historyZip"
+                                        accept=".zip">
+                                    <span class="file-cta">
+                                        <span class="file-icon">
+                                            <i class="fas fa-upload"></i>
+                                        </span>
+                                        <span class="file-label">
+                                            Choose File
+                                        </span>
+                                    </span>
+                                    <span id="fileName" class="file-name">
+                                        No file selected
+                                    </span>
+                                </label>
+                            </div>
+                            <div id="file-error-message" class="hidden error-message">
+                                File selection unsuccessful, please try again.
+                            </div>
+                            <div id="file-error-message-special" class="hidden error-message"></div>
+                            <br>
+                        </ol>
+                        <br>
+
+                        <p><b>This displays the minimized web search and browsing information that will be collected
+                                when you submit this form.</b>
+                        </p>
+                        <textarea id="dataVisual" class="textarea" placeholder="" rows="10" readonly> </textarea>
+                    </div>
+                </div>
+                <div class="columns is-centered">
+                    <div class="column is-8 has-text-centered">
+                        <div id="submit-error" class="hidden error-message">
+                            File submission unsuccessful. Please try again.
+                        </div>
+                        <button id="submitButton" type="button" class="button is-link" disabled>Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="../resources/js/jszip.js"></script>
+    <script src="../resources/js/landingPageMobile.js"></script>
+</body>
+
+</html>

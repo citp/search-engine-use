@@ -1,3 +1,16 @@
+async function detectAdBlock() {
+    let adBlockEnabled = false
+    const googleAdUrl = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'
+    try {
+        await fetch(new Request(googleAdUrl)).catch(_ => adBlockEnabled = true)
+    } catch (e) {
+        adBlockEnabled = true;
+    } finally {
+        return adBlockEnabled;
+    }
+}
+
+
 const millisecondsPerDay = 1000 * 3600 * 24;
 
 let historyDataEntered = false;
@@ -5,6 +18,11 @@ let historyDataEntered = false;
 let outputData = {};
 
 const changedDefault = (new URLSearchParams(window.location.search)).get('CHANGED_DEFAULT');
+const prolificId = (new URLSearchParams(window.location.search)).get("PROLIFIC_PID");
+const studyPhase = (new URLSearchParams(window.location.search)).get("STUDY_PHASE");
+const treatmentCondition = parseInt((new URLSearchParams(window.location.search)).get("TC"), 10);
+
+const queryKeys = new Set(["q", "query", "p", "wd", "word"]);
 
 let changedDefaultKey = changedDefault;
 if (changedDefaultKey == "Ask.com") {
@@ -16,52 +34,6 @@ if (changedDefaultKey == "Ask.com") {
 window.addEventListener('pageshow', function (event) {
     document.getElementById('fileInput').value = '';
 });
-
-function unescapeCSV(csvLine) {
-    let fields = [];
-    let field = '';
-    let inQuotes = false;
-
-    for (let i = 0; i < csvLine.length; i++) {
-        const char = csvLine[i];
-
-        if (char === '"') {
-            if (inQuotes && csvLine[i + 1] === '"') {
-                field += '"';
-                i++;
-            } else {
-                inQuotes = !inQuotes;
-            }
-        } else if (char === ',' && !inQuotes) {
-            fields.push(field);
-            field = '';
-        } else {
-            field += char;
-        }
-    }
-
-    fields.push(field); // Add the last field
-
-    return fields.map(f => f.startsWith('"') && f.endsWith('"') ? f.slice(1, -1).trim() : f.trim());
-}
-
-function csvToArrayOfObjects(csvData) {
-    let lines = csvData.split("\n").filter(line => line.trim() !== '');
-    let headers = unescapeCSV(lines[0]);
-    let result = lines.slice(1).map(line => {
-        let obj = {};
-        let values = unescapeCSV(line);
-
-        headers.forEach((header, index) => {
-            obj[header] = values[index];
-        });
-
-        return obj;
-    });
-
-    return result;
-}
-
 
 function getQueryVariable(url, parameter) {
     const urlObject = new URL(url);
@@ -75,11 +47,14 @@ document.getElementById('continueButton').onclick = () => {
 
 document.getElementById('submitButton').onclick = async (event) => {
     event.target.classList.add("is-loading");
+    document.getElementById('submit-error').classList.remove("is-active");
+
     const url = "https://q5mrwzyq1e.execute-api.us-east-2.amazonaws.com/deployed";
 
     const postBodyJson = {
-        prolificId: (new URLSearchParams(window.location.search)).get("PROLIFIC_PID"),
-        studyPhase: document.querySelector('meta[name="studyPhase"]').getAttribute('data-value'),
+        prolificId: prolificId,
+        studyPhase: studyPhase,
+        treatmentCondition: treatmentCondition,
         historyData: outputData,
     }
 
@@ -99,22 +74,12 @@ document.getElementById('submitButton').onclick = async (event) => {
         })
         .then(data => {
             if (data.statusCode == 200) {
-                document.getElementById('formSection').style.display = 'none';
-                document.getElementById('thankYouSection').style.display = 'block';
-
-                const studyPhase = document.querySelector('meta[name="studyPhase"]').getAttribute('data-value');
-
-                if (studyPhase == "initial") {
-                    window.open("https://app.prolific.com/submissions/complete?cc=C58MQPWX", '_blank');
-                } else {
-                    window.open("https://app.prolific.com/submissions/complete?cc=C1JEBN0S", '_blank');
-                }
+                window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_23rpQ1POFvbm7RQ?PROLIFIC_PID=${prolificId}`;
             } else {
                 throw new Error();
             }
-
         }).catch(() => {
-            document.getElementById('submit-error').classList.add("error-message", "is-active");
+            document.getElementById('submit-error').classList.add("is-active");
         });
 
     event.target.classList.remove("is-loading")
@@ -224,43 +189,75 @@ document.getElementById('fileInput').addEventListener('change', event => {
     document.getElementById("fileName").innerHTML = file.name;
 
     const reader = new FileReader();
-    reader.onload = function (event) {
+    reader.onload = async function (event) {
         try {
             document.getElementById("file-error-message").classList.remove("is-active");
+            document.getElementById("file-error-message-special").classList.remove("is-active");
             document.getElementById("fileInputDiv").classList.remove("is-danger");
 
             let historyArray = null;
 
-            const studyPhase = document.querySelector('meta[name="studyPhase"]').getAttribute('data-value');
             historyArray = JSON.parse(event.target.result);
 
-            historyArray.forEach(obj => {
-                obj.visitTime = Math.floor(obj.visitTime / 1000) * 1000;
-            });
-
+            // In the initial phase, reject if less than 10 days of history
             if (studyPhase == "initial") {
                 const daysBetweenFirstAndLastHistoryItem = (historyArray[0].visitTime - historyArray[historyArray.length - 1].visitTime) / millisecondsPerDay;
                 if (daysBetweenFirstAndLastHistoryItem < 10) {
-                    window.location.href = "https://app.prolific.com/submissions/complete?cc=C12WFWOM";
+                    window.location.href = "https://app.prolific.com/submissions/complete?cc=C1OIROZ1";
                     return;
                 }
+            }
 
-                // Check if the participant conducted the test of their changed default
+            // Check if the participant conducted the test of their changed default.
+            if (studyPhase == "initial" && ((treatmentCondition >= 2 && treatmentCondition <= 6))) {
                 const filteredHistoryForCheckingTest = historyArray.filter((historyItem) =>
-                    (Date.now() - historyItem.visitTime) / (1000 * 60) <= 15
+                    ((Date.now() - historyItem.visitTime) / (1000 * 60) <= 15) &&
+                    (searchEnginesMetadata[changedDefaultKey].getIsSerpPage(historyItem.url)) &&
+                    (historyItem.transition == "generated")
                 );
 
                 let userConductedTest = false;
-                for (let historyItem of filteredHistoryForCheckingTest) {
-                    if (searchEnginesMetadata[changedDefaultKey].getIsSerpPage(historyItem.url) &&
-                        historyItem.transition == "generated") {
-                        userConductedTest = true;
-                    }
+                if (treatmentCondition == 6) {
+                    userConductedTest = filteredHistoryForCheckingTest.length >= 2;
+                } else {
+                    userConductedTest = filteredHistoryForCheckingTest.length >= 1;
                 }
 
                 if (!userConductedTest) {
                     historyDataEntered = false;
                     document.getElementById('submitButton').disabled = true;
+
+                    if (treatmentCondition == 6) {
+
+                        const userAgent = navigator.userAgent;
+
+                        let ddgInstallLink = "";
+                        if ((/edg/i).test(userAgent)) {
+                            ddgInstallLink = "https://microsoftedge.microsoft.com/addons/detail/duckduckgo-search-track/caoacbimdbbljakfhgikoodekdnlcgpk";
+                        } else {
+                            ddgInstallLink = "https://chromewebstore.google.com/detail/duckduckgo-search-tracker/bkdgflcldnnnapblkhphbgpggdiikppg";
+                        }
+                        document.getElementById("file-error-message-special").innerHTML = `We were not able to confirm that you have installed and activated the DuckDuckGo Search & Tracker Protection web browser extension. Please run two different web searches in a new tab using your web browser's address bar. You may use any search queries that you choose. These searches should run with DuckDuckGo. If either of the searches runs with a search engine that is different from DuckDuckGo, please ensure that the DuckDuckGo Privacy Essentials extension is installed and activated. You can install the extension by clicking <a href="${ddgInstallLink}" target="_blank">here</a>. After installation, return to your web browser's settings, confirm that the extension is toggled on, and then run another two searches from the address bar. Once complete, repeat the steps above to generate an updated JSON file and upload the newly generated file.`
+
+                    } else {
+                        document.getElementById("file-error-message-special").innerText = `We were not able to confirm that you have tried out ${changedDefault}. Please run a web search in a new tab using your web browser's address bar. You may use any search query that you choose. This search should run with ${changedDefault}. If your search still runs with a search engine that is different from ${changedDefault}, please return to your web browser's settings, confirm that the default search engine is set to ${changedDefault}, and then in a new tab run another search from your web browser's address bar. Once complete, repeat the steps above to generate an updated JSON file and upload the newly generated file.`
+                    }
+                    document.getElementById("file-error-message-special").classList.add("is-active");
+
+                    document.getElementById("fileInputDiv").classList.add("is-danger");
+                    document.getElementById('dataVisual').innerHTML = ""
+                    return;
+                }
+            }
+
+            if (studyPhase != "initial") {
+                const daysSinceMostRecentHistoryEntry = (Date.now() - historyArray[0].visitTime) / millisecondsPerDay;
+                if (daysSinceMostRecentHistoryEntry > 10) {
+                    historyDataEntered = false;
+                    document.getElementById('submitButton').disabled = true;
+
+                    document.getElementById("file-error-message-special").innerText = "It appears you are attempting to upload a version of the history.json file that you downloaded previously. Please ensure you are submitting the most recent version of the history.json file, which you just downloaded."
+                    document.getElementById("file-error-message-special").classList.add("is-active");
 
                     document.getElementById("fileInputDiv").classList.add("is-danger");
                     document.getElementById('dataVisual').innerHTML = ""
@@ -271,7 +268,7 @@ document.getElementById('fileInput').addEventListener('change', event => {
             const searchUseData = [];
 
             const queryToIdMap = new Map();
-            let idCounter = 0;
+            let nextQueryId = 0;
 
             const filteredHistoryForPeriod = historyArray.filter((historyItem) =>
                 (Date.now() - historyItem.visitTime) / millisecondsPerDay <= 30
@@ -282,73 +279,77 @@ document.getElementById('fileInput').addEventListener('change', event => {
             const realVisitCounts = {};
 
             for (let historyItem of filteredHistoryForPeriod) {
-                for (let searchEngine in searchEnginesMetadata) {
-                    if (searchEnginesMetadata[searchEngine].getIsSerpPage(historyItem.url)) {
+                const [searchEngine, _] =
+                    Object.entries(searchEnginesMetadata).find(([_, engine]) =>
+                        engine.getIsSerpPage(historyItem.url)
+                    ) || [];
 
-                        let queryId = -1;
-                        try {
-                            const query = getSerpQuery(historyItem.url, searchEngine);
-                            if (query == null) {
-                                queryId = -1;
+                if (!searchEngine) {
+                    continue;
+                }
+
+                let queryId = -1;
+                try {
+                    const query = getSerpQuery(historyItem.url, searchEngine);
+                    if (query != null) {
+                        if (!queryToIdMap.has(query)) {
+                            queryToIdMap.set(query, nextQueryId++);
+                        }
+                        queryId = queryToIdMap.get(query);
+                    }
+                } catch (error) {
+                    queryId = -1;
+                }
+
+                const queryParameters = (() => {
+                    try {
+                        const url = new URL(historyItem.url);
+                        const params = new URLSearchParams(url.search);
+
+                        const query = getSerpQuery(historyItem.url, searchEngine);
+
+                        const result = [];
+                        for (const [key, value] of params.entries()) {
+                            if (value == query || queryKeys.has(key)) {
+                                result.push([key, "search-study-hidden"]);
                             } else {
-                                if (!queryToIdMap.has(query)) {
-                                    queryToIdMap.set(query, idCounter++);
-                                }
-                                queryId = queryToIdMap.get(query)
+                                result.push([key, value]);
                             }
-                        } catch (error) {
-                            queryId = -1;
                         }
 
-                        const queryParameterKeys = (() => {
-                            try {
-                                return Array.from(new URL(historyItem.url).searchParams.keys());
-                            } catch {
-                                return [];
-                            }
-                        })();
+                        return result;
+                    } catch {
+                        return [];
+                    }
+                })();
 
 
+                if (!(historyItem.url in realVisitCounts)) {
+                    realVisitCounts[historyItem.url] = historyItem.visitCount;
+                }
 
-
-
-
-                        if (!(historyItem.url in realVisitCounts)) {
-                            realVisitCounts[historyItem.url] = historyItem.visitCount;
-                        }
-
-                        const previouslyConductedSearch = (() => {
-                            try {
-                                if (historyItem.transition == "reload") {
-                                    return true;
-                                } else {
-                                    return realVisitCounts[historyItem.url] > 1;
-                                }
-                            } catch {
-                                return false;
-                            }
-                        })();
-
+                const previousSearchCount = (() => {
+                    try {
                         if (historyItem.transition != "reload") {
                             realVisitCounts[historyItem.url] -= 1;
                         }
-
-
-
-
-                        searchUseData.push(
-                            {
-                                searchEngine: searchEngine,
-                                timestamp: historyItem.visitTime,
-                                transition: historyItem.transition,
-                                queryId: queryId,
-                                previouslyConductedSearch,
-                                queryParameterKeys,
-                                isLocal: historyItem.isLocal,
-                            }
-                        );
+                        return realVisitCounts[historyItem.url];
+                    } catch {
+                        return -1;
                     }
-                }
+                })();
+
+                searchUseData.push(
+                    {
+                        searchEngine: searchEngine,
+                        timestamp: historyItem.visitTime,
+                        transition: historyItem.transition,
+                        queryId: queryId,
+                        previousSearchCount,
+                        queryParameters,
+                        isLocal: historyItem.isLocal,
+                    }
+                );
             }
 
             const browserUseData = [];
@@ -364,7 +365,7 @@ document.getElementById('fileInput').addEventListener('change', event => {
                         numUniqueWebpagesWithoutFragmentIdentifiers:
                             [...new Set(filteredHistoryForDay.map(historyItem => historyItem.url.split("#")[0]))].length,
                         numUniqueWebpagesWithoutQueryParameters:
-                            [...new Set(filteredHistoryForDay.map(historyItem => historyItem.url.split("?")[0]))].length,
+                            [...new Set(filteredHistoryForDay.map(historyItem => historyItem.url.split("?")[0].split("#")[0]))].length,
                         numUniqueDomains:
                             [...new Set(filteredHistoryForDay.map(historyItem => (new URL(historyItem.url)).hostname.split('.').slice(-2).join('.')))].length,
                         numUniqueAbsoluteDomains:
@@ -378,6 +379,7 @@ document.getElementById('fileInput').addEventListener('change', event => {
                 timezoneOffset: new Date().getTimezoneOffset(),
                 searchUseData: searchUseData,
                 browserUseData: browserUseData,
+                hasAdBlock: await detectAdBlock()
             }
 
             document.getElementById('dataVisual').innerHTML = JSON.stringify(outputData, null, 2);
@@ -388,7 +390,6 @@ document.getElementById('fileInput').addEventListener('change', event => {
             historyDataEntered = false;
             document.getElementById("file-error-message").classList.add("is-active");
             document.getElementById("fileInputDiv").classList.add("is-danger");
-
             document.getElementById('dataVisual').innerHTML = ""
         }
 

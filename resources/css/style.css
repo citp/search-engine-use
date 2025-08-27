@@ -112,3 +112,12 @@
     margin-right: auto;
     margin-bottom: 0.5rem;
 }
+
+
+
+
+.apple-settings-logo {
+    vertical-align: text-bottom;
+    height: 1em !important;
+    width: auto !important;
+}

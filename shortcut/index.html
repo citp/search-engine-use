@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>Princeton University - Search Engine Use Study</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+
+    <link rel="stylesheet" href="../resources/css/style.css">
+
+    <link rel="icon" href="../resources/images/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+    <section class="page-content">
+        <div class="hero-body" style="padding-top: 2rem;">
+            <div class="columns is-mobile">
+                <div class="column is-2-tablet is-5-mobile is-offset-2-tablet" style="padding: 0;">
+                    <figure class="image">
+                        <img src="../resources/images/princeton-logo.png">
+                    </figure>
+                </div>
+            </div>
+            <div id="infoSection">
+                <div class="columns is-centered">
+                    <div class="column is-8">
+                        <p>
+                            <span id="conditional-info-text"></span>
+                            <br>
+                            <br>
+                            Please continue for instructions on how to complete the next step.
+                        </p>
+                    </div>
+                </div>
+                <div class="columns is-centered">
+                    <div class="column is-8 has-text-centered">
+                        <button id="continueButton" class="button is-link">Continue &raquo;</button>
+                    </div>
+                </div>
+            </div>
+            <div id="instructionSection" style="display: none;">
+                <div class="columns is-centered">
+                    <div class="column is-8">
+                        <p>
+                            On your iPhone, a Shortcut is a quick way of changing settings and interacting with apps.
+                            For this next step in the study, we will ask you to install and run a Shortcut. This
+                            Shortcut will <span id="conditional-instruction-text"></span> the default search engine on
+                            your iPhone.
+                            <br>
+                            <br>
+                            Please follow the steps below to install and run the required Shortcut on your iPhone.
+                        </p>
+                    </div>
+                </div>
+                <div class="columns is-centered">
+                    <div class="column is-7">
+                        <ol type="1">
+                            <li>
+                                Tap <b><a id="install-shortcut-link" href="" target="_blank">this link</a></b> to access
+                                the Shortcut.
+                            </li>
+                            <br>
+                            <li>
+                                If an <b>Add Shortcut</b> button appears, tap it to install the Shortcut. <b>Do not run
+                                    the Shortcut after installing it. Simply install it and return to this page.</b>
+                                <br>
+                                <br>
+                                If a Get Shortcut button appears in Safari, you will need to install the Apple Shortcuts
+                                app. Tap the button and follow the prompts to install the app, then begin these
+                                instructions again.
+                            </li>
+                            <br>
+                            <li>
+                                Once the Shortcut is installed, tap <b><a id="run-shortcut-link" href=""
+                                        target="_blank">this link</a></b> this
+                                link to run it.
+
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="columns is-centered">
+                    <div class="column is-8">
+                        <p>
+                            Once you have completed running the Shortcut, it will automatically direct you to survey
+                            questions about your experience with the Shortcut. If you are not redirected to the survey,
+                            please re-run the Shortcut and ensure you follow it through to completion. Once you reach
+                            the survey, you may close this page if it remains open.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="../resources/js/shortcut.js"></script>
+</body>
+
+</html>
