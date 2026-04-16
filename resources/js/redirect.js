@@ -72,13 +72,14 @@ const prolificId = (new URLSearchParams(window.location.search)).get("PROLIFIC_P
         if (studyPhase == "initial") {
             const previousTreatmentCondition = localStorage.getItem("searchEngineUseStudyTreatmentCondition");
 
-            const alreadyCompletedIdsResponse = await fetch('../resources/data/prolific_ids_already_participated.txt');
-            const alreadyCompletedIdsText = await alreadyCompletedIdsResponse.text();
-            const alreadyCompletedIds = alreadyCompletedIdsText.trim().split("\n");
+            // const alreadyCompletedIdsResponse = await fetch('../resources/data/prolific_ids_already_participated.txt');
+            // const alreadyCompletedIdsText = await alreadyCompletedIdsResponse.text();
+            // const alreadyCompletedIds = alreadyCompletedIdsText.trim().split("\n");
 
-            if (alreadyCompletedIds.includes(prolificId)) {
-                window.location.href = "https://app.prolific.com/submissions/complete?cc=CZQ6R4A5";
-            } else if (previousTreatmentCondition &&
+            // if (alreadyCompletedIds.includes(prolificId)) {
+            //     window.location.href = "https://app.prolific.com/submissions/complete?cc=CZQ6R4A5";
+            // } else
+            if (previousTreatmentCondition &&
                 (previousTreatmentCondition != treatmentCondition) &&
                 !(treatmentCondition <= 6 && previousTreatmentCondition >= 7)) {
                 window.location.href = "https://app.prolific.com/submissions/complete?cc=CZQ6R4A5";
@@ -160,7 +161,7 @@ const prolificId = (new URLSearchParams(window.location.search)).get("PROLIFIC_P
                     if (treatmentCondition >= 7) {
                         window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_d0j48IRyrPFRIvc?PROLIFIC_PID=${prolificId}&INITIAL_ORIGINAL=${row['Initial Original']}&INITIAL_CHANGED=${row['Initial Changed']}&TC=${row['Treatment Condition']}`;
                     } else {
-                        window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_3UaZUKjbxXfAJHU?PROLIFIC_PID=${prolificId}`;
+                        window.location.href = `https://princetonsurvey.az1.qualtrics.com/jfe/form/SV_cHiAEfOPDhNw7lQ?PROLIFIC_PID=${prolificId}&INITIAL_ORIGINAL=${row['Initial Original']}&INITIAL_CHANGED=${row['Initial Changed']}&TC=${row['Treatment Condition']}`;
                     }
                 } else {
                     // Incompatible device return code

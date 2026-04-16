@@ -276,7 +276,6 @@ document.getElementById('fileInput').addEventListener('change', async event => {
 
                 document.getElementById("file-error-message-special").innerText = "It appears you are attempting to upload a version of the history.json file that you downloaded previously. Please ensure you are submitting the most recent version of the history.json file, which you just downloaded."
                 document.getElementById("file-error-message-special").classList.add("is-active");
-
                 document.getElementById("fileInputDiv").classList.add("is-danger");
                 document.getElementById('dataVisual').innerHTML = ""
                 return;
